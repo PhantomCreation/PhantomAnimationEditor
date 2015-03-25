@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+#Phantom animation editor by Genshin Souzou Kabushiki Kaisha
+#licensed under the GNU GPL v3
+
+require_relative '../lib/phantom-animation-editor/editor_window.rb'
+
+class PhantomAnimationEditorStandalone
+  TITLE = 'Phantom animation editor'
+  NAME = 'phantom-animation-editor'
+
+  def initialize(width = 800, height = 600, file = nil)
+    @editor_window = PhantomAnimationEditor::EditorWindow.new(width, height)
+  end
+end
+
+PhantomAnimationEditorStandalone.new
