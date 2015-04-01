@@ -58,7 +58,7 @@ class PhantomAnimationEditor::EditorWindow
     end
 
     @import_button = @builder['file_chooser']
-    @import_button.add_filter(create_filter)
+    add_filter(@import_button)
     @import_button.signal_connect('file_set') do |response|
       file_import(File.expand_path(response.filename))
     end
@@ -204,7 +204,7 @@ class PhantomAnimationEditor::EditorWindow
   def add_dialog
     dialog = create_dialog('Open File', Gtk::FileChooser::Action::OPEN, Gtk::Stock::OPEN)
     dialog.set_select_multiple(true) 
-    dialog.add_filter(create_filter)
+    add_filter(dialog)
 
     if dialog.run == Gtk::ResponseType::ACCEPT
       dialog.filenames.each do |filename|
@@ -218,7 +218,7 @@ class PhantomAnimationEditor::EditorWindow
 
   def import_dialog
     dialog = create_dialog('Import File', Gtk::FileChooser::Action::OPEN, Gtk::Stock::OPEN)
-    dialog.add_filter(create_filter)
+    add_filter(dialog)
 
     if dialog.run == Gtk::ResponseType::ACCEPT
       file_import(File.expand_path(dialog.filename))
@@ -256,7 +256,15 @@ class PhantomAnimationEditor::EditorWindow
                                         [stock, Gtk::ResponseType::ACCEPT]])
   end
 
-  def create_filter
+  def add_filter(dialog)
+    dialog.add_filter(create_all_filter)
+    types = %w(png jpg jpeg gif svg)
+    types.each do |type|
+      dialog.add_filter(create_filter(type))
+    end
+  end
+
+  def create_all_filter
     filter = Gtk::FileFilter.new
     filter.name = 'Image File'
     filter.add_pattern('*.png')
@@ -264,6 +272,13 @@ class PhantomAnimationEditor::EditorWindow
     filter.add_pattern('*.jpeg')
     filter.add_pattern('*.gif')
     filter.add_pattern('*.svg')
+    filter
+  end
+
+  def create_filter(type)
+    filter = Gtk::FileFilter.new
+    filter.name = "#{type} File"
+    filter.add_pattern("*.#{type}")
     filter
   end
 
