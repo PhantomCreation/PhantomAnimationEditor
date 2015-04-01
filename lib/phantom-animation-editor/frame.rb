@@ -1,65 +1,76 @@
 require 'gtk3'
 require 'tmpdir'
 
+# Animation frame.
 class PhantomAnimationEditor::Frame < Gtk::Frame
   THUMBNAIL_SIZE = 100
   attr_accessor :filename, :pixbuf, :apngframe
 
-  def initialize(filename, parent, apngframe = nil)
+  def initialize(filename, parent)
     super()
     @filename = filename
     @parent = parent
-    @apngframe = apngframe
 
-    if @apngframe.nil?
-      image = Gtk::Image.new(file: @filename)
-    else
-      Dir::mktmpdir(nil, File.dirname(__FILE__)) do |dir|
-        @apngframe.save("#{dir}/#{@filename}")
-        image = Gtk::Image.new(file: "#{dir}/#{@filename}")
-      end
-    end
+    image = create_thumbnail
+    @pixbuf = image.pixbuf
 
-    if image.pixbuf != nil
+    create_image_button(image)
+    create_spinner
+    create_delete_button
+
+    add(create_box)
+  end
+
+  def create_thumbnail
+    image = Gtk::Image.new(file: @filename)
+    unless image.pixbuf.nil?
       if image.pixbuf.width > THUMBNAIL_SIZE || image.pixbuf.height > THUMBNAIL_SIZE
         image.pixbuf = resize(image.pixbuf, THUMBNAIL_SIZE)
       end
     end
-    @pixbuf = image.pixbuf
-
-    image_button = Gtk::Button.new
-    image_button.set_relief(Gtk::ReliefStyle::NONE)
-    image_button.add(image)
-    image_button.signal_connect('clicked') do
-      @parent.focus(self)
-    end
-
-    box = Gtk::Box.new(:vertical)
-    box.pack_start(image_button, expand: true, fill: false, padding: 10)
-
-    adjustment = Gtk::Adjustment.new(100, 1, 999, 1, 1, 0)
-    @delay_spinner = Gtk::SpinButton.new(adjustment, 1, 0)
-    set_delay(@apngframe.nil? ? 100 : @apngframe.delay_numerator)
-    box.pack_start(@delay_spinner, expand: false, fill: false)
-
-    delete_button = Gtk::Button.new(label: 'Delete')
-    delete_button.signal_connect('clicked') do
-      @parent.delete(self)
-    end
-    box.pack_start(delete_button, expand: false, fill: false)
-
-    add(box)
+    image
   end
 
   def resize(pixbuf, size)
-   if pixbuf.width >= pixbuf.height
-     scale = pixbuf.height.to_f / pixbuf.width.to_f
-     pixbuf = pixbuf.scale(size, size * scale, Gdk::Pixbuf::INTERP_BILINEAR)
-   else
-     scale = pixbuf.width.to_f / pixbuf.height.to_f
-     pixbuf = pixbuf.scale(size * scale, size, Gdk::Pixbuf::INTERP_BILINEAR)
-   end
-   pixbuf
+    if pixbuf.width >= pixbuf.height
+      scale = pixbuf.height.to_f / pixbuf.width.to_f
+      pixbuf = pixbuf.scale(size, size * scale, Gdk::Pixbuf::INTERP_BILINEAR)
+    else
+      scale = pixbuf.width.to_f / pixbuf.height.to_f
+      pixbuf = pixbuf.scale(size * scale, size, Gdk::Pixbuf::INTERP_BILINEAR)
+    end
+    pixbuf
+  end
+
+  def create_image_button(image)
+    @image_button = Gtk::Button.new
+    @image_button.set_relief(Gtk::ReliefStyle::NONE)
+    @image_button.add(image)
+    @image_button.signal_connect('clicked') do
+      @parent.focus(self)
+    end
+  end
+
+  def create_spinner
+    adjustment = Gtk::Adjustment.new(100, 1, 999, 1, 1, 0)
+    @delay_spinner = Gtk::SpinButton.new(adjustment, 1, 0)
+    # TODO: delay set.
+    # set_delay(@apngframe.nil? ? 100 : @apngframe.delay_numerator)
+  end
+
+  def create_delete_button
+    @delete_button = Gtk::Button.new(label: 'Delete')
+    @delete_button.signal_connect('clicked') do
+      @parent.delete(self)
+    end
+  end
+
+  def create_box
+    box = Gtk::Box.new(:vertical)
+    box.pack_start(@image_button, expand: true, fill: false, padding: 10)
+    box.pack_start(@delay_spinner, expand: false, fill: false)
+    box.pack_start(@delete_button, expand: false, fill: false)
+    box
   end
 
   def delay

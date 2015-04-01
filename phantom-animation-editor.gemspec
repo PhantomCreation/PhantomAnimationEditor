@@ -11,8 +11,6 @@ Gem::Specification.new do |s|
 
   s.executables << 'phantom-animation-editor'
 
-  # TODO: remove rapngasm
-  s.add_dependency 'rapngasm', '~> 3.1', '3.1.6'
   s.add_dependency 'phantom_svg'
   s.add_dependency 'gtk3'
 end

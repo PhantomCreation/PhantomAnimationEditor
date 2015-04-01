@@ -6,7 +6,7 @@ require_relative 'adapter.rb'
 class PhantomAnimationEditor::EditorWindow
   def initialize(width = 800, height = 600)
     @play = false
-    @loop_status = false
+    @loop_status = true
     @frames_status = false
 
     @builder = Gtk::Builder.new
@@ -69,6 +69,7 @@ class PhantomAnimationEditor::EditorWindow
     end
 
     @loop_checkbutton = @builder['loop_checkbutton']
+    @loop_checkbutton.active = true
     @loop_checkbutton.signal_connect('toggled') do
       @loop_status = @loop_checkbutton.active?
       @play_loop.set_active(@loop_status)
@@ -240,8 +241,9 @@ class PhantomAnimationEditor::EditorWindow
 
   def help_dialog
     # TODO dialog message
-    dialog = Gtk::MessageDialog.new(message: 'Phantom animation editor is a software to create an animation file.',
-                                    parent: @window_base)
+    dialog = Gtk::MessageDialog.new(
+      message: 'Phantom animation editor is a software to create an animation file.',
+      parent: @window_base)
     dialog.run
     dialog.destroy
   end
@@ -256,8 +258,12 @@ class PhantomAnimationEditor::EditorWindow
 
   def create_filter
     filter = Gtk::FileFilter.new
-    filter.name = 'PNG File'
+    filter.name = 'Image File'
     filter.add_pattern('*.png')
+    filter.add_pattern('*.jpg')
+    filter.add_pattern('*.jpeg')
+    filter.add_pattern('*.gif')
+    filter.add_pattern('*.svg')
     filter
   end
 
@@ -335,6 +341,6 @@ class PhantomAnimationEditor::EditorWindow
 
   def file_export(filename)
     adapter = PhantomAnimationEditor::Adapter.new
-    adapter.export(@frame_list, filename, @frames_status)
+    adapter.export(@frame_list, filename, @frames_status, @loop_status)
   end
 end

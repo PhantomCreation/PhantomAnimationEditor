@@ -65,12 +65,12 @@ class PhantomAnimationEditor::FrameList
   end
 
   def delete_all
-    for i in 0..@list.size do
+    @list.size.times do
       child = @list[0]
       @list.delete(child)
       @frame_hbox.remove(child)
     end
-    @cur == 0
+    @cur = 0
     $preview.set_stock(Gtk::Stock::MISSING_IMAGE)
   end
 
