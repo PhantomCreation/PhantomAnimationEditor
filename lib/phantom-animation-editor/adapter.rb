@@ -1,24 +1,29 @@
 require 'phantom_svg'
+require 'rapngasm'
 require 'fileutils'
 require_relative 'frame_list.rb'
 require_relative 'frame.rb'
 
 class PhantomAnimationEditor::Adapter
   def initialize
+    # TODO: apng or アニメーションsvgをインポートしてエクスポートしようとすると
+    #       ファイルが必要になるため、作業用フォルダを作成して保存している。
+    @tmp_dir = "#{File.dirname(__FILE__)}/tmp"
+    Dir.mkdir(@tmp_dir) unless File.exist?(@tmp_dir)
   end
 
   def import(frame_list, filename)
-    # TODO:
-    # @apngasm.reset
-    # apngframes = @apngasm.disassemble(filename)
-    # filename = File.basename(filename, '.png')
-    # new_frames = []
+    new_frames = []
+    @loader = Phantom::SVG::Base.new
+    @loader.add_frame_from_file(filename)
 
-    # apngframes.each_with_index do |apngframe, i|
-    #   new_frames << PhantomAnimationEditor::Frame.new("#{filename}_#{i}.png", frame_list, apngframe)
-    # end
+    @loader.frames.each_with_index do |frame, i|
+      tmp_filename = "#{@tmp_dir}/#{Time.now.to_i}_#{i}.svg"
+      @loader.save_svg_frame(tmp_filename, frame)
+      new_frames << PhantomAnimationEditor::Frame.new(tmp_filename, frame_list)
+    end
 
-    # new_frames
+    new_frames
   end
 
   def export(frame_list, filename, frames_status, loop_status)
@@ -71,10 +76,14 @@ class PhantomAnimationEditor::Adapter
 
   def save_apng_frames
     # TODO: phantom_svgにapngの各フレームの保存関数がない
+    apngasm = APNGAsm.new
+    apngasm.disassemble(@filename)
+    dest = "#{File.dirname(@filename)}/#{File.basename(@filename, '.png')}"
+    FileUtils.mkdir_p(dest) unless File.exist?(dest)
+    apngasm.save_pngs(dest)
   end
 
   def check_filename(filename)
-    # TODO: 保存時のファイル拡張子の設定、制限がUIでできないかどうか確認
     filename = if filename.include?('.svg') || filename.include?('.png')
                  filename
                else

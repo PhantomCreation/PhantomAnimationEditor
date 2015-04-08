@@ -230,6 +230,7 @@ class PhantomAnimationEditor::EditorWindow
 
   def export_dialog
     dialog = create_dialog('Save File', Gtk::FileChooser::Action::SAVE, Gtk::Stock::SAVE)
+    add_filter(dialog, %w(png svg))
     dialog.do_overwrite_confirmation = true
 
     if dialog.run == Gtk::ResponseType::ACCEPT
@@ -256,22 +257,19 @@ class PhantomAnimationEditor::EditorWindow
                                         [stock, Gtk::ResponseType::ACCEPT]])
   end
 
-  def add_filter(dialog)
-    dialog.add_filter(create_all_filter)
-    types = %w(png jpg jpeg gif svg)
+  def add_filter(dialog, types = %w(png jpg jpeg gif svg))
+    dialog.add_filter(create_multiple_filter(types))
     types.each do |type|
       dialog.add_filter(create_filter(type))
     end
   end
 
-  def create_all_filter
+  def create_multiple_filter(types)
     filter = Gtk::FileFilter.new
     filter.name = 'Image File'
-    filter.add_pattern('*.png')
-    filter.add_pattern('*.jpg')
-    filter.add_pattern('*.jpeg')
-    filter.add_pattern('*.gif')
-    filter.add_pattern('*.svg')
+    types.each do |type|
+      filter.add_pattern("*.#{type}")
+    end
     filter
   end
 
