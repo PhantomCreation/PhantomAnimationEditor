@@ -1,15 +1,12 @@
 require 'phantom_svg'
 require 'rapngasm'
 require 'fileutils'
+require 'tmpdir'
 require_relative 'frame_list.rb'
 require_relative 'frame.rb'
 
 class PhantomAnimationEditor::Adapter
   def initialize
-    # TODO: apng or アニメーションsvgをインポートしてエクスポートしようとすると
-    #       ファイルが必要になるため、作業用フォルダを作成して保存している。
-    @tmp_dir = "#{File.dirname(__FILE__)}/tmp"
-    Dir.mkdir(@tmp_dir) unless File.exist?(@tmp_dir)
   end
 
   def import(frame_list, filename)
@@ -17,12 +14,21 @@ class PhantomAnimationEditor::Adapter
     @loader = Phantom::SVG::Base.new
     @loader.add_frame_from_file(filename)
 
+    Dir.mktmpdir do |dir|
+      new_frames = import_frames(dir, frame_list)
+    end
+
+    data = {frames: new_frames, phantom_frames: @loader.frames}
+    data
+  end
+
+  def import_frames(dir, frame_list)
+    new_frames = []
     @loader.frames.each_with_index do |frame, i|
-      tmp_filename = "#{@tmp_dir}/#{Time.now.to_i}_#{i}.svg"
+      tmp_filename = "#{dir}/#{i}.svg"
       @loader.save_svg_frame(tmp_filename, frame)
       new_frames << PhantomAnimationEditor::Frame.new(tmp_filename, frame_list)
     end
-
     new_frames
   end
 
@@ -31,16 +37,15 @@ class PhantomAnimationEditor::Adapter
     @filename = check_filename(filename)
     @frames_status = frames_status
     @loop_status = loop_status
+    @loader = frame_list.phantom_svg
 
-    @loader = Phantom::SVG::Base.new
-    set_frames
+    set_params
     save
   end
 
-  def set_frames
-    @frames.each do |frame|
-      @loader.add_frame_from_file(frame.filename)
-      @loader.frames[-1].duration = frame.delay * 0.001
+  def set_params
+    @frames.each_with_index do |frame, i|
+      @loader.frames[i].duration = frame.delay * 0.001
     end
     @loader.loops = 1 unless @loop_status
   end

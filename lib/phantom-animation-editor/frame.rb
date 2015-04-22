@@ -1,10 +1,7 @@
-require 'gtk3'
-require 'tmpdir'
-
 # Animation frame.
 class PhantomAnimationEditor::Frame < Gtk::Frame
   THUMBNAIL_SIZE = 100
-  attr_accessor :filename, :pixbuf, :apngframe
+  attr_accessor :filename, :pixbuf
 
   def initialize(filename, parent)
     super()
@@ -54,8 +51,6 @@ class PhantomAnimationEditor::Frame < Gtk::Frame
   def create_spinner
     adjustment = Gtk::Adjustment.new(100, 1, 999, 1, 1, 0)
     @delay_spinner = Gtk::SpinButton.new(adjustment, 1, 0)
-    # TODO: delay set.
-    # set_delay(@apngframe.nil? ? 100 : @apngframe.delay_numerator)
   end
 
   def create_delete_button

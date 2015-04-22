@@ -82,6 +82,7 @@ class PhantomAnimationEditor::EditorWindow
 
     @file_new = @builder['menu_file_new']
     @file_new.signal_connect('activate') do
+      stop_animation if @play
       label = Gtk::Label.new('New File?')
       label.show
       dialog = create_confirm_dialog(label, "new")
@@ -341,12 +342,13 @@ class PhantomAnimationEditor::EditorWindow
 
   def file_import(filename)
     adapter = PhantomAnimationEditor::Adapter.new
-    new_frames = adapter.import(@frame_list, filename)
+    data = adapter.import(@frame_list, filename)
 
-    new_frames.each do |frame|
+    data[:frames].each do |frame|
       @frame_list << frame
       @frame_list.frame_hbox.pack_start(frame, expand: false, fill: false, padding: 10)
     end
+    @frame_list.phantom_svg.frames.concat(data[:phantom_frames])
 
     $preview.set_pixbuf(@frame_list.pixbuf(@frame_list.cur)) if @frame_list.size > 0
     @window_base.show_all
