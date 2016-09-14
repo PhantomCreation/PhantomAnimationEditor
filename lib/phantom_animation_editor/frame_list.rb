@@ -1,3 +1,5 @@
+require_relative '../phantom_animation_editor.rb'
+
 require 'phantom_svg'
 
 class PhantomAnimationEditor::FrameList

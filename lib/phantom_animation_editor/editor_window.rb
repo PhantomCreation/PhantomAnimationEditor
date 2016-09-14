@@ -1,4 +1,6 @@
-require_relative '../phantom-animation-editor.rb'
+require_relative '../phantom_animation_editor.rb'
+
+require 'gtk3'
 require_relative 'frame_list.rb'
 require_relative 'frame.rb'
 require_relative 'adapter.rb'
@@ -203,7 +205,7 @@ class PhantomAnimationEditor::EditorWindow
   end
 
   def add_dialog
-    dialog = create_dialog('Open File', Gtk::FileChooser::Action::OPEN, Gtk::Stock::OPEN)
+    dialog = create_dialog('Open File', Gtk::FileChooserAction::OPEN, Gtk::Stock::OPEN)
     dialog.set_select_multiple(true) 
     add_filter(dialog)
 
@@ -218,7 +220,7 @@ class PhantomAnimationEditor::EditorWindow
   end
 
   def import_dialog
-    dialog = create_dialog('Import File', Gtk::FileChooser::Action::OPEN, Gtk::Stock::OPEN)
+    dialog = create_dialog('Import File', Gtk::FileChooserAction::OPEN, Gtk::Stock::OPEN)
     add_filter(dialog)
 
     if dialog.run == Gtk::ResponseType::ACCEPT

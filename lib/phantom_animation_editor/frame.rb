@@ -1,3 +1,5 @@
+require_relative '../phantom_animation_editor.rb'
+
 # Animation frame.
 class PhantomAnimationEditor::Frame < Gtk::Frame
   THUMBNAIL_SIZE = 100
@@ -31,10 +33,10 @@ class PhantomAnimationEditor::Frame < Gtk::Frame
   def resize(pixbuf, size)
     if pixbuf.width >= pixbuf.height
       scale = pixbuf.height.to_f / pixbuf.width.to_f
-      pixbuf = pixbuf.scale(size, size * scale, Gdk::Pixbuf::INTERP_BILINEAR)
+      pixbuf = pixbuf.scale(size, size * scale, GdkPixbuf::InterpType::BILINEAR)
     else
       scale = pixbuf.width.to_f / pixbuf.height.to_f
-      pixbuf = pixbuf.scale(size * scale, size, Gdk::Pixbuf::INTERP_BILINEAR)
+      pixbuf = pixbuf.scale(size * scale, size, GdkPixbuf::InterpType::BILINEAR)
     end
     pixbuf
   end

@@ -3,7 +3,7 @@
 # Phantom animation editor by Genshin Souzou Kabushiki Kaisha
 # licensed under the GNU GPL v3
 
-require_relative '../lib/phantom-animation-editor/editor_window.rb'
+require_relative '../lib/phantom_animation_editor/editor_window.rb'
 
 class PhantomAnimationEditorStandalone
   TITLE = 'Phantom animation editor'
