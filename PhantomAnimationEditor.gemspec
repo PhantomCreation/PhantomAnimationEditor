@@ -2,8 +2,8 @@ Gem::Specification.new do |s|
   s.name        = 'PhantomAnimationEditor'
   s.version     = '0.1.0'
   s.license     = 'GPL-3.0+'
-  s.summary     = ""
-  s.description = ""
+  s.summary     = "Animation editor that generates frame animated SVG and animated PNG files"
+  s.description = "Animation editor primarily targeted at making small but high quality animations."
   s.authors     = ['Rei Kagetsuki', 'Rika Yoshida']
   s.email       = 'info@phantom.industries'
   s.homepage    = 'https://github.com/PhantomCreation/PhantomAnimationEditor'
